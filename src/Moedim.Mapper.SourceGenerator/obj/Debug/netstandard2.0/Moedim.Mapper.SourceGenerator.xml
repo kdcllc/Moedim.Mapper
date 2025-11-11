@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Moedim.Mapper.SourceGenerator</name>
+    </assembly>
+    <members>
+        <member name="T:Moedim.Mapper.SourceGenerator.MapperGenerator">
+            <summary>
+            Source generator for creating object mapping extension methods.
+            </summary>
+        </member>
+        <member name="M:Moedim.Mapper.SourceGenerator.MapperGenerator.Initialize(Microsoft.CodeAnalysis.IncrementalGeneratorInitializationContext)">
+            <summary>
+            Initializes the generator.
+            </summary>
+        </member>
+    </members>
+</doc>
