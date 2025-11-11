@@ -1,0 +1,68 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B2C3D4E5-F6G7-8901-BCDE-F23456789012}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{C3D4E5F6-G7H8-9012-CDEF-345678901234}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper", "src\Moedim.Mapper\Moedim.Mapper.csproj", "{D4E5F6G7-H8I9-0123-DEF4-56789012345A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper.SourceGenerator", "src\Moedim.Mapper.SourceGenerator\Moedim.Mapper.SourceGenerator.csproj", "{E5F6G7H8-I9J0-1234-EF56-789012345678}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper.Tests", "tests\Moedim.Mapper.Tests\Moedim.Mapper.Tests.csproj", "{F6G7H8I9-J0K1-2345-F678-90123456789A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper.Performance.Tests", "tests\Moedim.Mapper.Performance.Tests\Moedim.Mapper.Performance.Tests.csproj", "{G7H8I9J0-K1L2-3456-7890-123456789ABC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper.SourceGenerator.Tests", "tests\Moedim.Mapper.SourceGenerator.Tests\Moedim.Mapper.SourceGenerator.Tests.csproj", "{H8I9J0K1-L2M3-4567-8901-23456789ABCD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moedim.Mapper.Sample", "samples\Moedim.Mapper.Sample\Moedim.Mapper.Sample.csproj", "{I9J0K1L2-M3N4-5678-9012-3456789ABCDE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4E5F6G7-H8I9-0123-DEF4-56789012345A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E5F6G7-H8I9-0123-DEF4-56789012345A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E5F6G7-H8I9-0123-DEF4-56789012345A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E5F6G7-H8I9-0123-DEF4-56789012345A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5F6G7H8-I9J0-1234-EF56-789012345678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5F6G7H8-I9J0-1234-EF56-789012345678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5F6G7H8-I9J0-1234-EF56-789012345678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5F6G7H8-I9J0-1234-EF56-789012345678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6G7H8I9-J0K1-2345-F678-90123456789A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6G7H8I9-J0K1-2345-F678-90123456789A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6G7H8I9-J0K1-2345-F678-90123456789A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6G7H8I9-J0K1-2345-F678-90123456789A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{G7H8I9J0-K1L2-3456-7890-123456789ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{G7H8I9J0-K1L2-3456-7890-123456789ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{G7H8I9J0-K1L2-3456-7890-123456789ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{G7H8I9J0-K1L2-3456-7890-123456789ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{H8I9J0K1-L2M3-4567-8901-23456789ABCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{H8I9J0K1-L2M3-4567-8901-23456789ABCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{H8I9J0K1-L2M3-4567-8901-23456789ABCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{H8I9J0K1-L2M3-4567-8901-23456789ABCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{I9J0K1L2-M3N4-5678-9012-3456789ABCDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{I9J0K1L2-M3N4-5678-9012-3456789ABCDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{I9J0K1L2-M3N4-5678-9012-3456789ABCDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{I9J0K1L2-M3N4-5678-9012-3456789ABCDE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D4E5F6G7-H8I9-0123-DEF4-56789012345A} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+		{E5F6G7H8-I9J0-1234-EF56-789012345678} = {A1B2C3D4-E5F6-7890-ABCD-EF1234567890}
+		{F6G7H8I9-J0K1-2345-F678-90123456789A} = {B2C3D4E5-F6G7-8901-BCDE-F23456789012}
+		{G7H8I9J0-K1L2-3456-7890-123456789ABC} = {B2C3D4E5-F6G7-8901-BCDE-F23456789012}
+		{H8I9J0K1-L2M3-4567-8901-23456789ABCD} = {B2C3D4E5-F6G7-8901-BCDE-F23456789012}
+		{I9J0K1L2-M3N4-5678-9012-3456789ABCDE} = {C3D4E5F6-G7H8-9012-CDEF-345678901234}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {12345678-9ABC-DEF0-1234-56789ABCDEF0}
+	EndGlobalSection
+EndGlobal
