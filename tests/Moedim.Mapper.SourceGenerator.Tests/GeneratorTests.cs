@@ -15,7 +15,20 @@ public class GeneratorTests
     {
         // Arrange
         var source = @"
-using Moedim.Mapper;
+using System;
+
+namespace Moedim.Mapper
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class MapFromAttribute : Attribute
+    {
+        public MapFromAttribute(Type sourceType)
+        {
+            SourceType = sourceType;
+        }
+        public Type SourceType { get; }
+    }
+}
 
 namespace TestNamespace
 {
@@ -25,7 +38,7 @@ namespace TestNamespace
         public int Age { get; set; }
     }
 
-    [MapFrom(typeof(Person))]
+    [Moedim.Mapper.MapFrom(typeof(Person))]
     public class PersonDto
     {
         public string Name { get; set; }

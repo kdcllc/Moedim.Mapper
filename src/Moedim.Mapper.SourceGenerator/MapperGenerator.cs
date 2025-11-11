@@ -138,7 +138,8 @@ public class MapperGenerator : IIncrementalGenerator
                 if (sourceType is not null)
                 {
                     var code = GenerateMappingExtension(sourceType, mappingInfo.TargetType, mappingInfo.TargetType);
-                    context.AddSource($"{sourceType.Name}To{mappingInfo.TargetType.Name}Extensions.g.cs", code);
+                    var fileName = $"{sourceType.ToDisplayString().Replace(".", "_")}To{mappingInfo.TargetType.ToDisplayString().Replace(".", "_")}_MapFrom.g.cs";
+                    context.AddSource(fileName, code);
                 }
             }
         }
@@ -151,7 +152,8 @@ public class MapperGenerator : IIncrementalGenerator
                 if (destType is not null)
                 {
                     var code = GenerateMappingExtension(mappingInfo.TargetType, destType, mappingInfo.TargetType);
-                    context.AddSource($"{mappingInfo.TargetType.Name}To{destType.Name}Extensions.g.cs", code);
+                    var fileName = $"{mappingInfo.TargetType.ToDisplayString().Replace(".", "_")}To{destType.ToDisplayString().Replace(".", "_")}_MapTo.g.cs";
+                    context.AddSource(fileName, code);
                 }
             }
         }
@@ -192,8 +194,9 @@ public class MapperGenerator : IIncrementalGenerator
         }
         sb.AppendLine();
 
-        // Generate extension class
-        var extensionClassName = $"{sourceSimpleName}To{destSimpleName}MappingExtensions";
+        // Generate extension class with unique name based on full type names
+        var uniqueId = Math.Abs((sourceTypeName + destTypeName).GetHashCode()).ToString();
+        var extensionClassName = $"{sourceSimpleName}To{destSimpleName}MappingExtensions_{uniqueId}";
         sb.AppendLine($"namespace {sourceNamespace};");
         sb.AppendLine();
         sb.AppendLine($"/// <summary>");
