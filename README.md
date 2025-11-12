@@ -6,6 +6,12 @@ C# Source Generator Object Mapper - Convention-based and Attribute-based mapping
 [![NuGet](https://img.shields.io/badge/nuget-v1.0.0-blue)]()
 [![License](https://img.shields.io/badge/license-MIT-green)]()
 
+![Stand With Israel](./img/IStandWithIsrael.png)
+
+> This is a Hebrew word that translates "feast" or "appointed time."
+> "Appointed times" refers to HaSham's festivals in Vayikra/Leviticus 23rd.
+> The feasts are "signals and signs" to help us know what is on the heart of HaShem.
+
 ## Features
 
 - **Compile-Time Code Generation** - Zero runtime overhead with source generators
@@ -17,6 +23,16 @@ C# Source Generator Object Mapper - Convention-based and Attribute-based mapping
 - **Ignored Properties** - Exclude specific properties from mapping
 - **High Performance** - Faster than reflection-based mappers
 - **Multi-Framework Support** - Targets .NET 6.0, .NET 7.0, and .NET 8.0
+
+## Hire me
+
+Please send [email](mailto:info@kingdavidconsulting.com) if you consider to **hire me**.
+
+[![buymeacoffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/vyve0og)
+
+## Give a Star! :star:
+
+If you like or are using this project to learn or start your solution, please give it a star. Thanks!
 
 ## Installation
 
@@ -90,10 +106,10 @@ public class Employee
 public class EmployeeDto
 {
     public string Name { get; set; }
-    
+
     [IgnoreProperty]  // Excluded from mapping
     public decimal Salary { get; set; }
-    
+
     [IgnoreProperty]  // Excluded from mapping
     public string SocialSecurityNumber { get; set; }
 }
@@ -116,10 +132,10 @@ public class TeamDto
 }
 
 // Collections are mapped automatically
-var team = new Team 
-{ 
-    Name = "Dev Team", 
-    Members = new List<string> { "Alice", "Bob" } 
+var team = new Team
+{
+    Name = "Dev Team",
+    Members = new List<string> { "Alice", "Bob" }
 };
 var dto = team.ToTeamDto();
 ```
@@ -193,6 +209,7 @@ Moedim.Mapper uses source generators to create mapping code at compile time, res
 - **Optimized for collections** - Efficient collection transformations
 
 Run benchmarks with:
+
 ```bash
 dotnet run --project tests/Moedim.Mapper.Performance.Tests -c Release
 ```
@@ -248,6 +265,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 Built with:
+
 - [Roslyn Source Generators](https://github.com/dotnet/roslyn)
 - [xUnit](https://xunit.net/)
 - [BenchmarkDotNet](https://benchmarkdotnet.org/)
@@ -256,6 +274,7 @@ Built with:
 ## Version History
 
 ### 1.0.0 (Initial Release)
+
 - Attribute-based mapping with `[MapFrom]` and `[MapTo]`
 - Custom property mapping with `[MapProperty]`
 - Property exclusion with `[IgnoreProperty]`

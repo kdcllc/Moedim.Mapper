@@ -5,9 +5,10 @@ All notable changes to Moedim.Mapper will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-01-11
+## [1.0.0] - 2025-11-11
 
 ### Added
+
 - Initial release of Moedim.Mapper
 - Source generator-based object mapping with compile-time code generation
 - Attribute-based mapping with `[MapFrom]` and `[MapTo]` attributes
@@ -26,12 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Complete README with usage examples and documentation
 
 ### Performance
+
 - Source generator mapping: ~10 ns/operation (only 3% slower than manual mapping)
 - 38x faster than reflection-based mapping
 - Zero runtime overhead - all mapping code generated at compile time
 - Minimal memory allocation (40 bytes per mapping, same as manual)
 
 ### Project Structure
+
 - `Moedim.Mapper` - Core library with attributes and interfaces
 - `Moedim.Mapper.SourceGenerator` - Roslyn incremental source generator
 - `Moedim.Mapper.Tests` - Unit tests with 10 test cases
