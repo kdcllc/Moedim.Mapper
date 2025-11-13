@@ -1,0 +1,9 @@
+<Project>
+  <!-- Override parent Directory.Build.props to prevent package inheritance issues -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <ItemGroup>
+    <!-- Remove inherited SourceLink package reference for tools -->
+    <PackageReference Remove="Microsoft.SourceLink.GitHub" />
+  </ItemGroup>
+</Project>
