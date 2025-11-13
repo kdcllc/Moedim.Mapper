@@ -548,6 +548,42 @@ public class MyMappingConfiguration
 - **Moedim.Mapper.Performance.Tests** - Performance benchmarks
 - **Moedim.Mapper.Sample** - Example usage
 
+## Migrating from AutoMapper
+
+Moedim.Mapper provides both automated and manual migration options:
+
+### Automated Migration Tool
+
+Install the migration tool globally:
+
+```bash
+dotnet tool install -g Moedim.Mapper.Migration.Tool
+```
+
+Analyze your project for AutoMapper usage:
+
+```bash
+moedim-mapper-migrate analyze path/to/YourProject.csproj --verbose
+```
+
+Migrate automatically to Moedim.Mapper:
+
+```bash
+moedim-mapper-migrate migrate path/to/YourProject.csproj
+```
+
+Generate a compatibility report:
+
+```bash
+moedim-mapper-migrate report path/to/YourProject.csproj --format html
+```
+
+For detailed tool documentation, see [Migration Tool README](tools/Moedim.Mapper.Migration.Tool/README.md).
+
+### Manual Migration
+
+For step-by-step manual migration guidance with code comparisons, see [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md).
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
