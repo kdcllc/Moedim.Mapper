@@ -13,7 +13,10 @@ public sealed class MapperConfigurationBuilder : IMapperConfigurationBuilder
     /// <summary>
     /// Gets all configured mapping expressions.
     /// </summary>
-    public IReadOnlyList<object> MappingExpressions => _mappingExpressions;
+    /// <remarks>
+    /// This property is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal IReadOnlyList<object> MappingExpressions => _mappingExpressions;
 
     /// <summary>
     /// Creates a mapping configuration between a source and destination type.
@@ -34,7 +37,10 @@ public sealed class MapperConfigurationBuilder : IMapperConfigurationBuilder
     /// <typeparam name="TSource">The source type.</typeparam>
     /// <typeparam name="TDestination">The destination type.</typeparam>
     /// <returns>The mapping expression if found; otherwise, null.</returns>
-    public MappingExpression<TSource, TDestination>? GetMappingExpression<TSource, TDestination>()
+    /// <remarks>
+    /// This method is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal MappingExpression<TSource, TDestination>? GetMappingExpression<TSource, TDestination>()
     {
         foreach (var expr in _mappingExpressions)
         {

@@ -16,17 +16,26 @@ public sealed class MappingExpression<TSource, TDestination> : IMappingExpressio
     /// <summary>
     /// Gets the source type.
     /// </summary>
-    public Type SourceType => typeof(TSource);
+    /// <remarks>
+    /// This property is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal Type SourceType => typeof(TSource);
 
     /// <summary>
     /// Gets the destination type.
     /// </summary>
-    public Type DestinationType => typeof(TDestination);
+    /// <remarks>
+    /// This property is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal Type DestinationType => typeof(TDestination);
 
     /// <summary>
     /// Gets all configured member mappings.
     /// </summary>
-    public IReadOnlyList<MemberConfiguration> MemberConfigurations => _memberConfigurations;
+    /// <remarks>
+    /// This property is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal IReadOnlyList<MemberConfiguration> MemberConfigurations => _memberConfigurations;
 
     /// <summary>
     /// Configures a custom mapping for a destination member.
@@ -65,7 +74,10 @@ public sealed class MappingExpression<TSource, TDestination> : IMappingExpressio
     /// <summary>
     /// Base class for member configuration.
     /// </summary>
-    public abstract class MemberConfiguration
+    /// <remarks>
+    /// This class is intended for testing purposes only and is not part of the public API.
+    /// </remarks>
+    internal abstract class MemberConfiguration
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberConfiguration"/> class.

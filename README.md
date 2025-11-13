@@ -417,10 +417,10 @@ using Moedim.Mapper;
 var builder = new MapperConfigurationBuilder();
 
 // Create a simple mapping
-builder.CreateMap<User, UserDto>();
+var mapping = builder.CreateMap<User, UserDto>();
 
-var mapping = builder.GetMappingExpression<User, UserDto>();
-Console.WriteLine($"Mapping: {mapping.SourceType.Name} → {mapping.DestinationType.Name}");
+// The mapping is now configured and ready to use
+// Note: mapping.ForMember() returns IMappingExpression for chaining
 ```
 
 #### Fluent Custom Property Mapping
@@ -434,8 +434,7 @@ builder.CreateMap<User, UserDto>()
     .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name))
     .ForMember(dest => dest.EmailAddress, opt => opt.MapFrom(src => src.Email));
 
-var mapping = builder.GetMappingExpression<User, UserDto>();
-// Configured 2 custom property mappings:
+// Custom property mappings configured:
 //   - FullName ← Name
 //   - EmailAddress ← Email
 ```
@@ -451,8 +450,6 @@ builder.CreateMap<User, UserDto>()
     .ForMember(dest => dest.InternalId, opt => opt.Ignore())
     .ForMember(dest => dest.Metadata, opt => opt.Ignore());
 
-var mapping = builder.GetMappingExpression<User, UserDto>();
-var ignoredProps = mapping.MemberConfigurations.Where(c => c.IsIgnored);
 // InternalId and Metadata will be excluded from mapping
 ```
 
@@ -486,7 +483,7 @@ builder.CreateMap<Customer, CustomerDto>()
 builder.CreateMap<Order, OrderDto>()
     .ForMember(dest => dest.OrderNumber, opt => opt.MapFrom(src => src.Id));
 
-Console.WriteLine($"Total mappings configured: {builder.MappingExpressions.Count}");
+// Multiple mappings are now configured in the builder
 ```
 
 #### Fluent API Interfaces

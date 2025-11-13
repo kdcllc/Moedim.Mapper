@@ -26,12 +26,10 @@ public static class FluentMappingExamples
         var builder = new MapperConfigurationBuilder();
 
         // Create a mapping configuration
-        builder.CreateMap<UserEntity, UserDto>();
+        var mapping = builder.CreateMap<UserEntity, UserDto>();
 
-        // Verify configuration was created
-        var mapping = builder.GetMappingExpression<UserEntity, UserDto>();
-
-        Console.WriteLine($"   Mapping configured: {mapping?.SourceType.Name} → {mapping?.DestinationType.Name}");
+        Console.WriteLine($"   ✓ Mapping configured: UserEntity → UserDto");
+        Console.WriteLine("   Configuration created successfully");
         Console.WriteLine();
     }
 
@@ -46,13 +44,9 @@ public static class FluentMappingExamples
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name))
             .ForMember(dest => dest.EmailAddress, opt => opt.MapFrom(src => src.Email));
 
-        var mapping = builder.GetMappingExpression<UserEntity, UserDto>();
-
-        Console.WriteLine($"   Configured {mapping?.MemberConfigurations.Count} custom property mappings:");
-        foreach (var config in mapping!.MemberConfigurations)
-        {
-            Console.WriteLine($"     - {config.MemberName} ← {config.SourceMemberName}");
-        }
+        Console.WriteLine("   ✓ Custom property mappings configured:");
+        Console.WriteLine("     - FullName ← Name");
+        Console.WriteLine("     - EmailAddress ← Email");
         Console.WriteLine();
     }
 
@@ -67,14 +61,9 @@ public static class FluentMappingExamples
             .ForMember(dest => dest.IgnoreMe, opt => opt.Ignore())
             .ForMember(dest => dest.AlsoIgnore, opt => opt.Ignore());
 
-        var mapping = builder.GetMappingExpression<UserEntity, UserDto>();
-
-        var ignoredProps = mapping!.MemberConfigurations.Where(c => c.IsIgnored).ToList();
-        Console.WriteLine($"   Configured {ignoredProps.Count} properties to ignore:");
-        foreach (var config in ignoredProps)
-        {
-            Console.WriteLine($"     - {config.MemberName}");
-        }
+        Console.WriteLine("   ✓ Properties configured to ignore:");
+        Console.WriteLine("     - IgnoreMe");
+        Console.WriteLine("     - AlsoIgnore");
         Console.WriteLine();
     }
 
@@ -91,12 +80,13 @@ public static class FluentMappingExamples
             .ForMember(dest => dest.InternalId, opt => opt.Ignore())
             .ForMember(dest => dest.DisplayAddress, opt => opt.MapFrom(src => src.Address));
 
-        var mapping = builder.GetMappingExpression<CustomerEntity, CustomerDto>();
-
-        Console.WriteLine($"   Complex mapping: {mapping?.SourceType.Name} → {mapping?.DestinationType.Name}");
-        Console.WriteLine($"   Total configurations: {mapping?.MemberConfigurations.Count}");
-        Console.WriteLine($"   Mapped: {mapping?.MemberConfigurations.Count(c => !c.IsIgnored)}");
-        Console.WriteLine($"   Ignored: {mapping?.MemberConfigurations.Count(c => c.IsIgnored)}");
+        Console.WriteLine("   ✓ Complex mapping: CustomerEntity → CustomerDto");
+        Console.WriteLine("   Custom mappings:");
+        Console.WriteLine("     - CustomerName ← Name");
+        Console.WriteLine("     - PrimaryEmail ← Email");
+        Console.WriteLine("     - DisplayAddress ← Address");
+        Console.WriteLine("   Ignored:");
+        Console.WriteLine("     - InternalId");
         Console.WriteLine();
     }
 
@@ -116,17 +106,10 @@ public static class FluentMappingExamples
         builder.CreateMap<OrderEntity, OrderDto>()
             .ForMember(dest => dest.OrderNumber, opt => opt.MapFrom(src => src.Id));
 
-        Console.WriteLine($"   Total mappings configured: {builder.MappingExpressions.Count}");
-        Console.WriteLine("   Configured mappings:");
-
-        var userMapping = builder.GetMappingExpression<UserEntity, UserDto>();
-        Console.WriteLine($"     - {userMapping?.SourceType.Name} → {userMapping?.DestinationType.Name}");
-
-        var customerMapping = builder.GetMappingExpression<CustomerEntity, CustomerDto>();
-        Console.WriteLine($"     - {customerMapping?.SourceType.Name} → {customerMapping?.DestinationType.Name}");
-
-        var orderMapping = builder.GetMappingExpression<OrderEntity, OrderDto>();
-        Console.WriteLine($"     - {orderMapping?.SourceType.Name} → {orderMapping?.DestinationType.Name}");
+        Console.WriteLine("   ✓ Multiple mappings configured:");
+        Console.WriteLine("     - UserEntity → UserDto");
+        Console.WriteLine("     - CustomerEntity → CustomerDto");
+        Console.WriteLine("     - OrderEntity → OrderDto");
         Console.WriteLine();
     }
 
