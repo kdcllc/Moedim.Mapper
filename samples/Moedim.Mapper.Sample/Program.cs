@@ -26,6 +26,12 @@ public class Program
             // Run complex mapping examples
             ComplexMappingExamples.Run();
 
+            Console.WriteLine(new string('─', 60));
+            Console.WriteLine();
+
+            // Run fluent configuration examples
+            FluentMappingExamples.Run();
+
             Console.WriteLine(new string('═', 60));
             Console.WriteLine("✓ All examples completed successfully!");
             Console.WriteLine("═".PadRight(60, '═'));

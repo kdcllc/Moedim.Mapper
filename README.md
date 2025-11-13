@@ -407,6 +407,90 @@ dotnet run --project tests/Moedim.Mapper.Performance.Tests -c Release
 
 ### Fluent Configuration Interface
 
+The fluent configuration API provides a programmatic way to define mappings with full IntelliSense support and type safety.
+
+#### Basic Fluent Mapping
+
+```csharp
+using Moedim.Mapper;
+
+var builder = new MapperConfigurationBuilder();
+
+// Create a simple mapping
+builder.CreateMap<User, UserDto>();
+
+var mapping = builder.GetMappingExpression<User, UserDto>();
+Console.WriteLine($"Mapping: {mapping.SourceType.Name} → {mapping.DestinationType.Name}");
+```
+
+#### Fluent Custom Property Mapping
+
+Map properties with different names using the fluent API:
+
+```csharp
+var builder = new MapperConfigurationBuilder();
+
+builder.CreateMap<User, UserDto>()
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name))
+    .ForMember(dest => dest.EmailAddress, opt => opt.MapFrom(src => src.Email));
+
+var mapping = builder.GetMappingExpression<User, UserDto>();
+// Configured 2 custom property mappings:
+//   - FullName ← Name
+//   - EmailAddress ← Email
+```
+
+#### Fluent Ignoring Properties
+
+Exclude specific properties from mapping:
+
+```csharp
+var builder = new MapperConfigurationBuilder();
+
+builder.CreateMap<User, UserDto>()
+    .ForMember(dest => dest.InternalId, opt => opt.Ignore())
+    .ForMember(dest => dest.Metadata, opt => opt.Ignore());
+
+var mapping = builder.GetMappingExpression<User, UserDto>();
+var ignoredProps = mapping.MemberConfigurations.Where(c => c.IsIgnored);
+// InternalId and Metadata will be excluded from mapping
+```
+
+#### Method Chaining
+
+The fluent API supports method chaining for concise configuration:
+
+```csharp
+var builder = new MapperConfigurationBuilder();
+
+builder.CreateMap<Customer, CustomerDto>()
+    .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Name))
+    .ForMember(dest => dest.PrimaryEmail, opt => opt.MapFrom(src => src.Email))
+    .ForMember(dest => dest.InternalId, opt => opt.Ignore())
+    .ForMember(dest => dest.DisplayAddress, opt => opt.MapFrom(src => src.Address));
+```
+
+#### Multiple Mapping Configurations
+
+Configure multiple type mappings in a single builder:
+
+```csharp
+var builder = new MapperConfigurationBuilder();
+
+builder.CreateMap<User, UserDto>()
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name));
+
+builder.CreateMap<Customer, CustomerDto>()
+    .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Name));
+
+builder.CreateMap<Order, OrderDto>()
+    .ForMember(dest => dest.OrderNumber, opt => opt.MapFrom(src => src.Id));
+
+Console.WriteLine($"Total mappings configured: {builder.MappingExpressions.Count}");
+```
+
+#### Fluent API Interfaces
+
 ```csharp
 public interface IMapperConfigurationBuilder
 {
@@ -418,6 +502,28 @@ public interface IMappingExpression<TSource, TDestination>
     IMappingExpression<TSource, TDestination> ForMember<TMember>(
         Expression<Func<TDestination, TMember>> destinationMember,
         Action<IMemberConfigurationExpression<TSource, TDestination, TMember>> memberOptions);
+}
+
+public interface IMemberConfigurationExpression<TSource, TDestination, TMember>
+{
+    void MapFrom(Expression<Func<TSource, TMember>> sourceMember);
+    void Ignore();
+}
+```
+
+### Configuration Marker Attribute
+
+Mark configuration classes for the source generator:
+
+```csharp
+[MapperConfiguration]
+public class MyMappingConfiguration
+{
+    public void Configure(IMapperConfigurationBuilder builder)
+    {
+        builder.CreateMap<User, UserDto>()
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.Name));
+    }
 }
 ```
 
