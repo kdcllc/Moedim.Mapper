@@ -18,8 +18,10 @@ C# Source Generator Object Mapper - Convention-based and Attribute-based mapping
 - **Attribute-Based Mapping** - Simple, declarative mapping configuration
 - **Type-Safe** - Full compile-time type checking and IntelliSense support
 - **Null-Safe** - Handles nullable reference types correctly
-- **Collection Support** - Maps List, Array, IEnumerable, and Dictionary types
+- **Nested Object Mapping** - Automatically maps nested complex objects
+- **Collection Support** - Maps List, Array, IEnumerable with complex object transformation
 - **Custom Property Mapping** - Map properties with different names
+- **Value Converters** - Custom transformation logic for property values
 - **Ignored Properties** - Exclude specific properties from mapping
 - **High Performance** - Faster than reflection-based mappers
 - **Multi-Framework Support** - Targets .NET 6.0, .NET 7.0, and .NET 8.0
@@ -164,6 +166,193 @@ var dto = person.ToPersonDto();
 var personAgain = dto.ToPerson();
 ```
 
+## Complex Object Mapping
+
+### Nested Object Mapping
+
+Moedim.Mapper automatically handles nested complex objects:
+
+```csharp
+public class Address
+{
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string ZipCode { get; set; }
+}
+
+[MapFrom(typeof(Address))]
+public class AddressDto
+{
+    public string Street { get; set; }
+    public string City { get; set; }
+    public string ZipCode { get; set; }
+}
+
+public class Customer
+{
+    public string Name { get; set; }
+    public Address DeliveryAddress { get; set; }
+}
+
+[MapFrom(typeof(Customer))]
+public class CustomerDto
+{
+    public string Name { get; set; }
+    public AddressDto DeliveryAddress { get; set; }
+}
+
+// Nested objects are automatically mapped
+var customer = new Customer
+{
+    Name = "John Doe",
+    DeliveryAddress = new Address
+    {
+        Street = "123 Main St",
+        City = "New York",
+        ZipCode = "10001"
+    }
+};
+
+var dto = customer.ToCustomerDto();
+// dto.DeliveryAddress will be an AddressDto with all properties mapped
+```
+
+### Collections of Complex Objects
+
+Map collections containing complex objects:
+
+```csharp
+public class OrderItem
+{
+    public string ProductName { get; set; }
+    public int Quantity { get; set; }
+    public decimal Price { get; set; }
+}
+
+[MapFrom(typeof(OrderItem))]
+public class OrderItemDto
+{
+    public string ProductName { get; set; }
+    public int Quantity { get; set; }
+    public decimal Price { get; set; }
+}
+
+public class Order
+{
+    public string OrderNumber { get; set; }
+    public List<OrderItem> Items { get; set; }
+}
+
+[MapFrom(typeof(Order))]
+public class OrderDto
+{
+    public string OrderNumber { get; set; }
+    public List<OrderItemDto> Items { get; set; }
+}
+
+// Collection items are automatically transformed
+var order = new Order
+{
+    OrderNumber = "ORD-001",
+    Items = new List<OrderItem>
+    {
+        new OrderItem { ProductName = "Laptop", Quantity = 1, Price = 1299.99m },
+        new OrderItem { ProductName = "Mouse", Quantity = 2, Price = 29.99m }
+    }
+};
+
+var dto = order.ToOrderDto();
+// dto.Items will be a List<OrderItemDto> with all items mapped
+```
+
+### Value Converters
+
+Apply custom transformation logic to property values:
+
+```csharp
+public class TemperatureReading
+{
+    public double Celsius { get; set; }
+    public DateTime Timestamp { get; set; }
+}
+
+// Custom converter implementation
+public class CelsiusToFahrenheitConverter : IValueConverter<double, double>
+{
+    public double Convert(double celsius)
+    {
+        return (celsius * 9.0 / 5.0) + 32.0;
+    }
+}
+
+[MapFrom(typeof(TemperatureReading))]
+public class TemperatureReadingDto
+{
+    [ConvertWith(typeof(CelsiusToFahrenheitConverter))]
+    public double Celsius { get; set; }  // Will contain Fahrenheit value
+
+    public DateTime Timestamp { get; set; }
+}
+
+// Usage
+var reading = new TemperatureReading { Celsius = 25.0, Timestamp = DateTime.Now };
+var dto = reading.ToTemperatureReadingDto();
+// dto.Celsius will be 77.0 (Fahrenheit)
+```
+
+### Deep Nesting
+
+Handle complex, deeply nested object graphs:
+
+```csharp
+public class Company
+{
+    public string Name { get; set; }
+    public Department MainDepartment { get; set; }
+    public List<Department> AllDepartments { get; set; }
+}
+
+public class Department
+{
+    public string Name { get; set; }
+    public Manager Manager { get; set; }
+    public List<Employee> Employees { get; set; }
+}
+
+public class Manager
+{
+    public string Name { get; set; }
+    public int YearsExperience { get; set; }
+}
+
+public class Employee
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+}
+
+// Corresponding DTOs with [MapFrom] attributes...
+
+// All levels are automatically mapped
+var company = new Company
+{
+    Name = "TechCorp",
+    MainDepartment = new Department
+    {
+        Name = "Engineering",
+        Manager = new Manager { Name = "Alice", YearsExperience = 10 },
+        Employees = new List<Employee>
+        {
+            new Employee { FirstName = "Bob", LastName = "Smith" },
+            new Employee { FirstName = "Carol", LastName = "Jones" }
+        }
+    }
+};
+
+var dto = company.ToCompanyDto();
+// Entire object graph is mapped recursively
+```
+
 ## Generated Code Example
 
 For the basic User/UserDto example, Moedim.Mapper generates:
@@ -236,8 +425,10 @@ public interface IMappingExpression<TSource, TDestination>
 
 - Direct type matches
 - Nullable value types (int to int?, etc.)
-- Collection types (Array, List, IEnumerable)
+- Collection types (Array, List, IEnumerable) with element transformation
 - Numeric conversions (int to long, etc.)
+- Nested complex objects (automatic recursive mapping)
+- Custom value converters (IValueConverter<TSource, TDest>)
 
 ## Requirements
 
@@ -278,6 +469,10 @@ Built with:
 - Attribute-based mapping with `[MapFrom]` and `[MapTo]`
 - Custom property mapping with `[MapProperty]`
 - Property exclusion with `[IgnoreProperty]`
-- Collection mapping support
+- Collection mapping support with automatic item transformation
+- **Nested object mapping** - Automatic recursive mapping of complex objects
+- **Value converters** - Custom transformation with `[ConvertWith]` and `IValueConverter<TSource, TDest>`
+- **Deep object graph mapping** - Handle multi-level nested structures
+- **Collection of complex objects** - Map `List<SourceType>` to `List<DestType>`
 - Null-safe code generation
 - Multi-framework support (.NET 6.0, 7.0, 8.0)

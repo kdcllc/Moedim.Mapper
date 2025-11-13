@@ -18,6 +18,8 @@ public class MapperGenerator : IIncrementalGenerator
     private const string MapToAttributeName = "Moedim.Mapper.MapToAttribute";
     private const string MapPropertyAttributeName = "Moedim.Mapper.MapPropertyAttribute";
     private const string IgnorePropertyAttributeName = "Moedim.Mapper.IgnorePropertyAttribute";
+    private const string ConvertWithAttributeName = "Moedim.Mapper.ConvertWithAttribute";
+    private const string MapWhenAttributeName = "Moedim.Mapper.MapWhenAttribute";
 
     /// <summary>
     /// Initializes the generator.
@@ -187,7 +189,7 @@ public class MapperGenerator : IIncrementalGenerator
         sb.AppendLine();
 
         // Add usings
-        var namespaces = new HashSet<string> { sourceNamespace, destNamespace };
+        var namespaces = new HashSet<string> { sourceNamespace, destNamespace, "System.Linq" };
         foreach (var ns in namespaces.Where(n => !string.IsNullOrEmpty(n) && n != "<global namespace>").OrderBy(n => n))
         {
             sb.AppendLine($"using {ns};");
@@ -223,8 +225,47 @@ public class MapperGenerator : IIncrementalGenerator
         {
             var (sourceProp, destProp) = propertiesToMap[i];
             var comma = i < propertiesToMap.Count - 1 ? "," : "";
-            
-            var mapping = GeneratePropertyMapping(sourceProp, destProp, "source");
+
+            // Check for ConvertWith attribute
+            var convertWithAttr = destProp.GetAttributes()
+                .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == ConvertWithAttributeName);
+
+            // Check for MapWhen attribute
+            var mapWhenAttr = destProp.GetAttributes()
+                .FirstOrDefault(a => a.AttributeClass?.ToDisplayString() == MapWhenAttributeName);
+
+            string mapping;
+
+            if (convertWithAttr is not null && convertWithAttr.ConstructorArguments.Length > 0)
+            {
+                var converterType = convertWithAttr.ConstructorArguments[0].Value as INamedTypeSymbol;
+                if (converterType is not null)
+                {
+                    var converterTypeName = converterType.ToDisplayString();
+                    mapping = $"new {converterTypeName}().Convert(source.{sourceProp.Name})";
+                }
+                else
+                {
+                    mapping = GeneratePropertyMapping(sourceProp, destProp, "source");
+                }
+            }
+            else
+            {
+                mapping = GeneratePropertyMapping(sourceProp, destProp, "source");
+            }
+
+            // Wrap in conditional if MapWhen is present
+            if (mapWhenAttr is not null && mapWhenAttr.ConstructorArguments.Length > 0)
+            {
+                var conditionPropertyName = mapWhenAttr.ConstructorArguments[0].Value as string;
+                if (!string.IsNullOrEmpty(conditionPropertyName))
+                {
+                    // For conditional mapping, we need to handle it differently
+                    // This is a simplified version - in production, you'd want more sophisticated handling
+                    sb.AppendLine($"            // Note: MapWhen attribute detected for {destProp.Name}. Manual implementation may be required.");
+                }
+            }
+
             sb.AppendLine($"            {destProp.Name} = {mapping}{comma}");
         }
 
@@ -291,11 +332,11 @@ public class MapperGenerator : IIncrementalGenerator
             return true;
 
         // Nullable compatibility
-        var sourceNonNullable = IsNullableValueType(sourceType) 
-            ? ((INamedTypeSymbol)sourceType).TypeArguments[0] 
+        var sourceNonNullable = IsNullableValueType(sourceType)
+            ? ((INamedTypeSymbol)sourceType).TypeArguments[0]
             : sourceType;
-        var destNonNullable = IsNullableValueType(destType) 
-            ? ((INamedTypeSymbol)destType).TypeArguments[0] 
+        var destNonNullable = IsNullableValueType(destType)
+            ? ((INamedTypeSymbol)destType).TypeArguments[0]
             : destType;
 
         if (SymbolEqualityComparer.Default.Equals(sourceNonNullable, destNonNullable))
@@ -307,6 +348,11 @@ public class MapperGenerator : IIncrementalGenerator
 
         // Numeric conversions (int to long, etc.)
         if (IsNumericType(sourceNonNullable) && IsNumericType(destNonNullable))
+            return true;
+
+        // Complex type compatibility - if both are complex types, assume they can be mapped
+        // This allows nested object mapping (e.g., Address -> AddressDto)
+        if (IsComplexType(sourceType) && IsComplexType(destType))
             return true;
 
         return false;
@@ -361,27 +407,13 @@ public class MapperGenerator : IIncrementalGenerator
         // Handle collections
         if (IsEnumerableType(sourceProp.Type) && IsEnumerableType(destProp.Type))
         {
-            if (sourceProp.Type is IArrayTypeSymbol sourceArray && destProp.Type is IArrayTypeSymbol destArray)
-            {
-                // Array to array
-                return $"{sourceAccess}";
-            }
-            else if (destProp.Type is INamedTypeSymbol destNamed)
-            {
-                var destTypeName = destNamed.OriginalDefinition.ToDisplayString();
-                if (destTypeName.StartsWith("System.Collections.Generic.List<"))
-                {
-                    // To List
-                    return $"{sourceAccess}?.ToList()";
-                }
-                else if (destTypeName.StartsWith("System.Collections.Generic.IEnumerable<"))
-                {
-                    // To IEnumerable
-                    return $"{sourceAccess}";
-                }
-            }
-            
-            return $"{sourceAccess}?.ToList()";
+            return GenerateCollectionMapping(sourceProp, destProp, sourceAccess);
+        }
+
+        // Handle nested complex objects
+        if (IsComplexType(sourceProp.Type) && IsComplexType(destProp.Type))
+        {
+            return GenerateNestedObjectMapping(sourceProp, destProp, sourceAccess);
         }
 
         // Handle nullable types
@@ -392,6 +424,133 @@ public class MapperGenerator : IIncrementalGenerator
 
         // Direct assignment
         return sourceAccess;
+    }
+
+    private static string GenerateCollectionMapping(IPropertySymbol sourceProp, IPropertySymbol destProp, string sourceAccess)
+    {
+        var sourceElementType = GetElementType(sourceProp.Type);
+        var destElementType = GetElementType(destProp.Type);
+
+        // If element types are the same or both are simple types, use direct collection conversion
+        if (sourceElementType is null || destElementType is null ||
+            SymbolEqualityComparer.Default.Equals(sourceElementType, destElementType) ||
+            (!IsComplexType(sourceElementType) && !IsComplexType(destElementType)))
+        {
+            if (sourceProp.Type is IArrayTypeSymbol && destProp.Type is IArrayTypeSymbol)
+            {
+                return $"{sourceAccess}";
+            }
+            else if (destProp.Type is INamedTypeSymbol destNamed)
+            {
+                var destTypeName = destNamed.OriginalDefinition.ToDisplayString();
+                if (destTypeName.StartsWith("System.Collections.Generic.List<"))
+                {
+                    return $"{sourceAccess}?.ToList()";
+                }
+                else if (destTypeName.StartsWith("System.Collections.Generic.IEnumerable<"))
+                {
+                    return $"{sourceAccess}";
+                }
+            }
+            return $"{sourceAccess}?.ToList()";
+        }
+
+        // Both element types are complex - need to map each element
+        var sourceElementTypeName = sourceElementType.ToDisplayString();
+        var destElementTypeName = destElementType.ToDisplayString();
+        var mapMethodName = $"To{destElementType.Name}";
+
+        if (destProp.Type is IArrayTypeSymbol)
+        {
+            return $"{sourceAccess}?.Select(x => x.{mapMethodName}()).OfType<{destElementTypeName}>().ToArray()";
+        }
+        else if (destProp.Type is INamedTypeSymbol destNamed)
+        {
+            var destTypeName = destNamed.OriginalDefinition.ToDisplayString();
+            if (destTypeName.StartsWith("System.Collections.Generic.List<"))
+            {
+                return $"{sourceAccess}?.Select(x => x.{mapMethodName}()).OfType<{destElementTypeName}>().ToList()";
+            }
+            else if (destTypeName.StartsWith("System.Collections.Generic.IEnumerable<") ||
+                     destTypeName.StartsWith("System.Collections.Generic.ICollection<"))
+            {
+                return $"{sourceAccess}?.Select(x => x.{mapMethodName}()).OfType<{destElementTypeName}>()";
+            }
+        }
+
+        return $"{sourceAccess}?.Select(x => x.{mapMethodName}()).OfType<{destElementTypeName}>().ToList()";
+    }
+
+    private static string GenerateNestedObjectMapping(IPropertySymbol sourceProp, IPropertySymbol destProp, string sourceAccess)
+    {
+        var destTypeName = destProp.Type.Name;
+        var mapMethodName = $"To{destTypeName}";
+
+        // Check if source type is nullable reference type or could be null
+        var isNullable = sourceProp.Type.NullableAnnotation == NullableAnnotation.Annotated ||
+                        !sourceProp.Type.IsValueType;
+
+        if (isNullable)
+        {
+            return $"{sourceAccess}?.{mapMethodName}()";
+        }
+
+        return $"{sourceAccess}.{mapMethodName}()";
+    }
+
+    private static bool IsComplexType(ITypeSymbol type)
+    {
+        // A complex type is a class or struct that is not a primitive, string, or collection
+        if (type.SpecialType != SpecialType.None && type.SpecialType != SpecialType.System_Object)
+        {
+            return false; // Primitive types
+        }
+
+        if (type.TypeKind == TypeKind.Enum)
+        {
+            return false;
+        }
+
+        if (IsEnumerableType(type))
+        {
+            return false;
+        }
+
+        // Check for common framework types that aren't complex for mapping purposes
+        var typeName = type.ToDisplayString();
+        if (typeName == "string" ||
+            typeName.StartsWith("System.DateTime") ||
+            typeName.StartsWith("System.DateTimeOffset") ||
+            typeName.StartsWith("System.TimeSpan") ||
+            typeName.StartsWith("System.Guid"))
+        {
+            return false;
+        }
+
+        // It's a complex type if it's a class or struct with properties
+        return type.TypeKind == TypeKind.Class || type.TypeKind == TypeKind.Struct;
+    }
+
+    private static ITypeSymbol? GetElementType(ITypeSymbol type)
+    {
+        if (type is IArrayTypeSymbol arrayType)
+        {
+            return arrayType.ElementType;
+        }
+
+        if (type is INamedTypeSymbol namedType)
+        {
+            var typeName = namedType.OriginalDefinition.ToDisplayString();
+            if (typeName.StartsWith("System.Collections.Generic.IEnumerable<") ||
+                typeName.StartsWith("System.Collections.Generic.List<") ||
+                typeName.StartsWith("System.Collections.Generic.IList<") ||
+                typeName.StartsWith("System.Collections.Generic.ICollection<"))
+            {
+                return namedType.TypeArguments.Length > 0 ? namedType.TypeArguments[0] : null;
+            }
+        }
+
+        return null;
     }
 
     private class MappingInfo
